@@ -12,7 +12,95 @@
             src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
         <script type="text/babel">
+            const { useState } = React;
 
+                function Modal({
+                    title, 
+                    content, 
+                    show = false, 
+                    onClose = () => {},
+                    onConfirm = () => {}
+                })
+                {
+                    return show && ReactDOM.createPortal(
+                        <div className="modal-container">
+                            <div className="modal">
+                                <h2>{title}</h2>
+                                <div>{content}</div>
+                                <button onClick={onClose}>Annulla</button>
+                                <button onClick={onConfirm}>Conferma</button>
+                            </div>
+                        </div>,
+                        document.body
+                    )
+                }
+
+
+            const ElencoAnimali = () => {
+                const animalsChoices = ["Cane", "Gatto", "Pappagallo", "Cavallo", "Panda"];
+                const [ add, setAdd ] = useState(animalsChoices)
+                const [show, setShow] = useState(false)
+                const [sceltaUtente, setSceltaUtente] = useState("")
+
+                function handleAnimals() {
+                    const randomIndex = Math.floor(Math.random() * animalsChoices.length);
+                    const randomAnimal = animalsChoices[randomIndex]
+                    setAdd([...add, randomAnimal])
+                }
+                
+                function listaUtente() {
+                    if (sceltaUtente !== "") {
+                        setAdd([...add, sceltaUtente])
+                        setShow(false)
+                        setSceltaUtente("")
+                    }
+                }
+                return (
+                   <section>
+                    <div>
+                        <button onClick={() => setShow(true)}>
+                            Aggiungi Animale
+                        </button>
+                    </div>
+                    <details>
+                        <summary>
+                            <strong>Animali</strong>
+                        </summary>
+                        <div>
+                            <ul>
+                                {
+                                    add.map(a => (
+                                        <li>{a}</li>
+                                    ))
+                                }
+                            </ul>
+                        </div>
+                        <Modal
+                            title='Aggiungi il tuo animale preferito'
+                            content={
+                                <input
+                                    type="text"
+                                    placeholder="Nome animale"
+                                    value={sceltaUtente}
+                                    onChange={(e) => setSceltaUtente(e.target.value)}
+                                />
+                            }
+                            show={show}
+                            onClose={() => setShow(false)}
+                            onConfirm={listaUtente}
+                        />
+
+                    </details>
+                </section>
+                )
+            }
+        </script>
+        <script type="text/babel">
+            const {createRoot} = ReactDOM;
+
+            const listaAnimali = document.querySelector('.lista-animali')
+            const root = createRoot(listaAnimali)
+            root.render(<ElencoAnimali />)
         </script>
     </head>
     <body>
